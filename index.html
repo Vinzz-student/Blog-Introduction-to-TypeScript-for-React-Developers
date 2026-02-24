@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypeScript for React · intro blog</title>
+  <!-- Font & simple reset style (professional minimal) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <style>
+    /* --- global reset & base --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f9fafc;
+      color: #1a2639;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* every region spans full width, no tiny centered boxes */
+    .wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1120px;         /* comfortable reading width */
+      padding: 0 2rem;           /* breathing on sides, never empty */
+      margin: 0 auto;
+    }
+
+    /* --- header / navigation --- */
+    .site-header {
+      width: 100%;
+      background: #ffffff;
+      border-bottom: 1px solid #e6edf4;
+      padding: 1.2rem 0;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(4px);
+      background-color: rgba(255,255,255,0.85);
+      z-index: 10;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      background: #2b3a67;
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.4rem;
+    }
+
+    .logo-text {
+      font-weight: 600;
+      font-size: 1.35rem;
+      letter-spacing: -0.01em;
+      color: #0b1e33;
+    }
+
+    .read-estimate {
+      background: #eef2f8;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #2c3e5c;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      border: 1px solid #dde5ef;
+    }
+
+    .read-estimate::before {
+      content: "⏱️";
+      font-size: 1.1rem;
+    }
+
+    /* --- main title area (full width) --- */
+    .hero {
+      width: 100%;
+      background: #ffffff;
+      padding: 2.5rem 0 1.2rem 0;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: #0c1a2b;
+      max-width: 900px;          /* avoids line overflow but stays left */
+    }
+
+    .hero .subhead {
+      font-size: 1.2rem;
+      color: #446688;
+      margin-top: 0.5rem;
+      font-weight: 400;
+      border-left: 5px solid #2b3a67;
+      padding-left: 1.5rem;
+      background: #f5f9ff;
+      padding: 1rem 1.5rem;
+      border-radius: 0 40px 40px 0;
+      width: fit-content;
+      margin-top: 1.5rem;
+    }
+
+    /* --- meta row (author, date) --- */
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2rem;
+      margin: 1.5rem 0 1rem 0;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed #cfddee;
+    }
+
+    .author {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .author-avatar {
+      background: #1e2f47;
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 1.2rem;
+    }
+
+    .author-detail .name {
+      font-weight: 600;
+      color: #0f293f;
+    }
+
+    .author-detail .role {
+      font-size: 0.9rem;
+      color: #4d6278;
+    }
+
+    .date-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #3f5570;
+      background: #ecf3fa;
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+    }
+
+    /* --- content grid (no skinny columns) --- */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 280px;  /* main + sidebar, but never empty */
+      gap: 2.5rem;
+      margin: 2.5rem 0;
+    }
+
+    /* main article */
+    .article-body {
+      background: white;
+      padding: 2rem;
+      border-radius: 24px;
+      box-shadow: 0 8px 25px rgba(0,20,40,0.04);
+      border: 1px solid #eaf0f8;
+    }
+
+    .article-body h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin: 1.8rem 0 1rem 0;
+      color: #0f2c44;
+      border-bottom: 2px solid #dde5f0;
+      padding-bottom: 0.4rem;
+    }
+
+    .article-body h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .article-body h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 1.8rem 0 0.8rem 0;
+      color: #203a58;
+    }
+
+    .article-body p {
+      margin-bottom: 1.2rem;
+      color: #253c54;
+    }
+
+    .code-block {
+      background: #1e293b;
+      color: #e3eaf2;
+      padding: 1.2rem 1.5rem;
+      border-radius: 16px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 1.6rem 0;
+      border-left: 6px solid #6ab0f5;
+      box-shadow: inset 0 0 0 1px #304562;
+    }
+
+    .inline-code {
+      background: #e3ecf5;
+      color: #0c2d53;
+      padding: 0.2rem 0.5rem;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9em;
+      font-weight: 500;
+      border: 1px solid #bdd0e8;
+    }
+
+    .tip-card {
+      background: #f0f7ff;
+      border-left: 6px solid #2b6c9e;
+      padding: 1.5rem;
+      border-radius: 20px;
+      margin: 2rem 0;
+    }
+
+    /* --- right sidebar (useful, not empty) --- */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .sidebar-card {
+      background: white;
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      border: 1px solid #dee9f2;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+    }
+
+    .sidebar-card h4 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1.3rem;
+      color: #0d2d49;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-card ul {
+      list-style: none;
+    }
+
+    .sidebar-card li {
+      margin-bottom: 1rem;
+      padding-left: 1.6rem;
+      position: relative;
+    }
+
+    .sidebar-card li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: #2b6c9e;
+      font-weight: 600;
+    }
+
+    .resource-link {
+      background: #f4f9ff;
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      display: inline-block;
+      margin-top: 0.2rem;
+      color: #1e4d7c;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border: 1px solid #cbddec;
+      transition: background 0.1s;
+    }
+
+    .resource-link:hover {
+      background: #e1edfc;
+    }
+
+    /* --- full width footer --- */
+    .site-footer {
+      width: 100%;
+      background: #0b1c2f;
+      color: #b6c9e0;
+      margin-top: 2.5rem;
+      padding: 2.5rem 0;
+      border-top: 1px solid #253c54;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .footer-small {
+      font-size: 0.9rem;
+    }
+
+    /* --- responsive: tablet & mobile --- */
+    @media (max-width: 900px) {
+      .content-grid {
+        grid-template-columns: 1fr;  /* stack, no empty spaces */
+        gap: 1.5rem;
+      }
+
+      .sidebar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+
+      .container {
+        padding: 0 1.5rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .sidebar {
+        grid-template-columns: 1fr;  /* single column on phone */
+      }
+
+      .header-inner {
+        flex-direction: column;
+        align-items: start;
+        gap: 0.8rem;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .article-body {
+        padding: 1.5rem;
+      }
+
+      .meta-row {
+        gap: 1rem;
+      }
+
+      .container {
+        padding: 0 1.2rem;
+      }
+    }
+
+    /* no tiny div in the middle — everything spans edge to edge */
+    .no-bottom-gap {
+      margin-bottom: 0;
+    }
+
+    /* minor touch */
+    hr {
+      border: none;
+      border-top: 2px solid #e2ebf6;
+      margin: 2rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- header full width (sticky) -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo-area">
+          <span class="logo-icon">TS</span>
+          <span class="logo-text">react<span style="font-weight:400;">+</span>types</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- hero / title (full width) -->
+    <div class="hero">
+      <div class="container">
+        <h1>Introduction to TypeScript<br> for React Developers</h1>
+        <div class="subhead">Stronger components, fewer bugs — and you already know most of it.</div>
+      </div>
+    </div>
+
+    <!-- main container with flexible content -->
+    <div class="container">
+      <!-- meta row (full width) -->
+      <div class="meta-row">
+        <div class="author">
+          <div class="author-avatar">R.A</div>
+          <div class="author-detail">
+            <div class="name">Reynando Alviano</div>
+            <div class="role">senior frontend · meta</div>
+          </div>
+        </div>
+        <div class="date-badge">
+          <span> 24 Feb 2026</span>
+        </div>
+      </div>
+
+      <!-- content grid: article + sidebar (no empty spaces) -->
+      <div class="content-grid">
+        <!-- main article -->
+        <article class="article-body">
+          <h2> Why TypeScript with React?</h2>
+          <p>TypeScript has become the standard for React codebases — from small startups to large enterprise. It gives you <strong>compile-time type checking</strong> and excellent editor autocompletion, without slowing down the developer experience. And the learning curve? Much gentler than you think.</p>
+
+          <h3>1. Props — the first win</h3>
+          <p>The moment you type a component's props, you get instant feedback. Forgetting to pass a required prop? TypeScript yells (in a friendly way).</p>
+          <div class="code-block">
+//  React + TypeScript component
+type ButtonProps = {
+  label: string;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary';   // optional with union
+};
+
+const Button = ({ label, onClick, variant = 'primary' }: ButtonProps) => {
+  return &lt;button className={`btn-${variant}`} onClick={onClick}&gt;{label}&lt;/button&gt;;
+};
+          </div>
+          <p><span class="inline-code">variant?</span> means optional. If you mistype <span class="inline-code">"primery"</span>, TS will gently correct you. No more runtime guessing.</p>
+
+          <h3>2. useState and inference</h3>
+          <p>TypeScript often infers types automatically. But with complex state, you can be explicit.</p>
+          <div class="code-block">
+const [user, setUser] = useState&lt;{ name: string; age: number } | null&gt;(null);
+// user is either null or the object shape
+          </div>
+
+          <div class="tip-card">
+            <strong>🔹 Pro tip:</strong> Use <span class="inline-code">interface</span> for props that are exported or extended; <span class="inline-code">type</span> is great for unions and tuples. Both work.
+          </div>
+
+          <h2> Event handlers & typings</h2>
+          <p>React provides built-in event types. No need to memorize — just hover over an inline handler and copy the type.</p>
+          <div class="code-block">
+const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+  console.log(e.target.value);
+};
+          </div>
+
+          <h2> Common patterns in React + TS</h2>
+          <h3>children prop</h3>
+          <div class="code-block">
+type CardProps = {
+  children: React.ReactNode;
+  title: string;
+};
+
+const Card = ({ children, title }: CardProps) => (
+  &lt;div class="card"&gt;&lt;h3&gt;{title}&lt;/h3&gt;{children}&lt;/div&gt;
+);
+          </div>
+          <p><span class="inline-code">React.ReactNode</span> is the most flexible — it includes JSX, strings, numbers, fragments, etc.</p>
+
+          <h3>useReducer with discriminated unions</h3>
+          <p>This is where TypeScript shines. Define actions as a union.</p>
+          <div class="code-block">
+type State = { count: number };
+type Action = 
+  | { type: 'increment' }
+  | { type: 'decrement' }
+  | { type: 'set'; payload: number };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'increment': return { count: state.count + 1 };
+    case 'decrement': return { count: state.count - 1 };
+    case 'set': return { count: action.payload };
+  }
+}
+          </div>
+
+          <h2> Migrating an existing React project</h2>
+          <p>You don't have to rewrite everything. Start with <span class="inline-code">.tsx</span> files and add gradual typing. The TypeScript compiler will guide you. Use <span class="inline-code">// @ts-expect-error</span> as a temporary escape hatch, but aim to remove them.</p>
+
+          <hr>
+
+          <p style="font-style: italic; color: #2b4b73;">TypeScript doesn't bite — it's just JavaScript with superpowers. Your future self (and your team) will thank you.</p>
+        </article>
+
+        <!-- right sidebar (full height, not empty) -->
+        <aside class="sidebar">
+          <div class="sidebar-card">
+            <h4>📘 quick reference</h4>
+            <ul>
+              <li><strong>interface Props {}</strong> – for object shapes</li>
+              <li><strong>type Union = A | B</strong> – for variants</li>
+              <li><strong>React.FC</strong> – legacy, avoid now</li>
+              <li><strong>useState&lt;Type&gt;</strong> – generic</li>
+              <li><strong>MouseEvent&lt;HTMLButton&gt;</strong></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card">
+            <h4>📂 common utility types</h4>
+            <ul>
+              <li><span class="inline-code">Pick&lt;T, K&gt;</span></li>
+              <li><span class="inline-code">Omit&lt;T, K&gt;</span></li>
+              <li><span class="inline-code">Partial&lt;T&gt;</span></li>
+              <li><span class="inline-code">Record&lt;K, V&gt;</span></li>
+            </ul>
+            <div style="margin-top: 1.4rem;">
+              <span class="resource-link">📄 cheatsheet (pdf)</span>
+              <span class="resource-link" style="margin-left:0.5rem;">🔧 tsconfig</span>
+            </div>
+          </div>
+
+          <div class="sidebar-card">
+            <h4>✅ 3-step start</h4>
+            <ul style="list-style: decimal; padding-left: 1.2rem;">
+              <li style="display: list-item; padding-left: 0; margin-bottom:0.6rem;"><span class="inline-code">npx create-react-app my-app --template typescript</span></li>
+              <li style="display: list-item; padding-left: 0; margin-bottom:0.6rem;">Rename .js to .tsx</li>
+              <li style="display: list-item; padding-left: 0;">Add types step by step</li>
+            </ul>
+          </div>
+        </aside>
+      </div>  <!-- end content-grid -->
+    </div>    <!-- end container -->
+
+    <!-- full width footer (no empty gaps) -->
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span class="footer-small">© 2026 · typescript for react devs</span>
+        <span class="footer-small">✉️ written with ts, react, and clarity</span>
+      </div>
+    </footer>
+  </div> <!-- end wrapper -->
+</body>
+</html>
